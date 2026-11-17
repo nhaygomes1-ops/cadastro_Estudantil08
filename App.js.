@@ -1,0 +1,89 @@
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+
+export default function App() {
+  const [nome, setNome] = useState('');
+  const [matricula, setMatricula] = useState('');
+  const [email, setEmail] = useState('');
+  const [curso, setCurso] = useState('');
+  const [estudantes, setEstudantes] = useState([]);
+  const [erro, setErro] = useState('');
+
+  const cadastrar = () => {
+    if (!nome.trim() || !matricula.trim() || !email.trim() || !curso.trim()) {
+      setErro('Todos os campos são obrigatórios.');
+      return;
+    }
+
+    const duplicada = estudantes.some((est) => est.matricula === matricula.trim());
+    if (duplicada) {
+      setErro('Matrícula já cadastrada.');
+      return;
+    }
+
+    const novoEstudante = {
+      nome: nome.trim(),
+      matricula: matricula.trim(),
+      email: email.trim(),
+      curso: curso.trim(),
+    };
+
+    setEstudantes([...estudantes, novoEstudante]);
+    setNome('');
+    setMatricula('');
+    setEmail('');
+    setCurso('');
+    setErro('');
+  };
+
+  const remover = (mat) => {
+    setEstudantes(estudantes.filter((est) => est.matricula !== mat));
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.titulo}>Cadastro de Estudantes</Text>
+
+      <TextInput style={styles.input} placeholder="Nome" value={nome} onChangeText={setNome} />
+      <TextInput style={styles.input} placeholder="Matrícula" value={matricula} onChangeText={setMatricula} />
+      <TextInput style={styles.input} placeholder="E-mail" value={email} onChangeText={setEmail} />
+      <TextInput style={styles.input} placeholder="Curso" value={curso} onChangeText={setCurso} />
+
+      <TouchableOpacity style={styles.botao} onPress={cadastrar}>
+        <Text style={styles.textoBotao}>Cadastrar</Text>
+      </TouchableOpacity>
+
+      {erro ? <Text style={styles.erro}>{erro}</Text> : null}
+
+      <ScrollView style={styles.lista}>
+        {estudantes.map((item) => (
+          <View key={item.matricula} style={styles.card}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.cardTitulo}>{item.nome}</Text>
+              <Text>Matrícula: {item.matricula}</Text>
+              <Text>E-mail: {item.email}</Text>
+              <Text>Curso: {item.curso}</Text>
+            </View>
+            <TouchableOpacity style={styles.botaoRemover} onPress={() => remover(item.matricula)}>
+              <Text style={styles.textoRemover}>Remover</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+      </ScrollView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, paddingTop: 50, paddingHorizontal: 20, backgroundColor: '#f5f5f5' },
+  titulo: { fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 15 },
+  input: { backgroundColor: '#fff', padding: 10, borderRadius: 8, marginBottom: 8, borderWidth: 1, borderColor: '#ccc' },
+  botao: { backgroundColor: '#0066cc', padding: 14, borderRadius: 8, marginTop: 5 },
+  textoBotao: { color: '#fff', textAlign: 'center', fontWeight: 'bold' },
+  erro: { color: 'red', textAlign: 'center', marginTop: 8 },
+  lista: { marginTop: 15 },
+  card: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', padding: 12, borderRadius: 8, marginBottom: 10 },
+  cardTitulo: { fontWeight: 'bold', fontSize: 16, marginBottom: 2 },
+  botaoRemover: { backgroundColor: '#dc3545', padding: 8, borderRadius: 6 },
+  textoRemover: { color: '#fff', fontWeight: 'bold' },
+});
